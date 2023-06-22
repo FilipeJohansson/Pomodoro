@@ -1,0 +1,31 @@
+.bg-green {
+    background-color: #5dbf85;
+}
+
+.bg-blue {
+    background-color: #59a4ca;
+}
+
+#header span {
+    font-size: 45px;
+}
+
+#body #controllers {
+    font-size: 30px;
+    gap: 10px;
+}
+
+#controllers>div {
+    margin: 10px;
+    padding: 0px;
+    color: white;
+    cursor: pointer;
+}
+
+#body #time {
+    font-size: 150px;
+}
+
+#body #text {
+    font-size: 30px;
+}
