@@ -16,7 +16,7 @@ export class AppComponent {
     private timersService: TimersService) {
     this.timersService.changeTimerEvent.subscribe((timer: TimerComponent) => {
       timer.onTimeChange.subscribe((time: Time) => {
-        let title = timer.name + ' - ' + time.minutes + ':' + time.seconds
+        let title = timer.name + ' - ' + this.timeToString(time.minutes) + ':' + this.timeToString(time.seconds)
         this.changeTitle(title)
       })
 
@@ -29,5 +29,12 @@ export class AppComponent {
 
   changeTitle(title: string) {
     this.titleService.setTitle(title)
+  }
+
+  timeToString(value: number): string {
+    return value.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false
+    })
   }
 }

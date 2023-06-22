@@ -12,8 +12,8 @@ export class TimersComponent implements OnInit {
   public colors = Colors
 
   timersData: TimerModel[] = [
-    { backgroundColor: Colors.BLUE, name: 'WORK', time: { minutes: 25, seconds: 0 } },
-    { backgroundColor: Colors.GREEN, name: 'BREAK', time: { minutes: 5, seconds: 0 } }
+    { backgroundColor: Colors.BLUE, name: 'WORK', time: { minutes: 0, seconds: 2 } },
+    { backgroundColor: Colors.GREEN, name: 'BREAK', time: { minutes: 0, seconds: 2 } }
   ];
 
   timersObject: TimerComponent[] = []
