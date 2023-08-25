@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { CommonModule } from '@angular/common'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 
 @Component({
   standalone: true,
@@ -9,11 +9,14 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrls: ['./buttons.component.css']
 })
 export class ButtonsComponent {
-  @Input({ required: true }) isAnyTimerRunning: boolean;
-  @Input({ required: true }) isCurrentTimerPaused: boolean;
+  @Input({ required: true }) isAnyTimerRunning: boolean
+  @Input({ required: true }) isCurrentTimerPaused: boolean
 
-  @Output() startPressed: EventEmitter<null> = new EventEmitter();
-  @Output() stopPressed: EventEmitter<null> = new EventEmitter();
-  @Output() pausePressed: EventEmitter<null> = new EventEmitter();
-  @Output() continuePressed: EventEmitter<null> = new EventEmitter();
+  @Output() startPressed = new EventEmitter()
+  @Output() stopPressed = new EventEmitter()
+  @Output() pausePressed = new EventEmitter()
+  @Output() continuePressed = new EventEmitter()
+  @Output() musicCheckboxChanged = new EventEmitter<boolean>()
+
+  onMusicCheckboxChanged = (e) => this.musicCheckboxChanged.emit(e.target.checked)
 }

@@ -17,7 +17,7 @@ export class TimerComponent implements OnInit {
 
   @Input({ required: true }) backgroundColor: Colors
   @Input({ required: true }) name: string
-  @Input({ required: true }) isAnyTimerRunning: Signal<boolean>;
+  @Input({ required: true }) isAnyTimerRunning: Signal<boolean>
   @Input({ alias: 'time', required: true }) userDefinedTime: TimeModel
 
   @Output() timerEnds: EventEmitter<boolean> = new EventEmitter()
@@ -140,16 +140,20 @@ export class TimerComponent implements OnInit {
       useGrouping: false
     })
 
-    this.currentRunningTimeString.set({ minutes: minutes, seconds: seconds });
+    this.currentRunningTimeString.set({ minutes: minutes, seconds: seconds })
   }
 
   playEndSound() {
     this.endSound.load()
+    this.endSound.volume = 0.5
+
     this.endSound.play()
   }
 
   playBipSound() {
     this.bipSound.load()
+    this.bipSound.volume = 0.5
+
     this.bipSound.play()
   }
 }

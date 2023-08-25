@@ -1,9 +1,9 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
-import { Title } from '@angular/platform-browser';
-import { ButtonsComponent } from './buttons/buttons.component';
-import { TimersComponent } from './timers/timers.component';
-import { TimersService } from './timers/timers.service';
+import { CommonModule } from '@angular/common'
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core'
+import { Title } from '@angular/platform-browser'
+import { ButtonsComponent } from './buttons/buttons.component'
+import { TimersComponent } from './timers/timers.component'
+import { TimersService } from './timers/timers.service'
 
 @Component({
   standalone: true,
@@ -51,4 +51,5 @@ export class AppComponent {
   onStopPressed = () => this.timersService.stopCurrentTimer()
   onPausePressed = () => this.timersService.pauseCurrentTimer()
   onContinuePressed = () => this.timersService.continueCurrentTimer()
+  onMusicCheckboxChanged = (value: boolean) => this.timersService.musicController(value)
 }

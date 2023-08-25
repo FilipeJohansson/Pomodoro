@@ -1,27 +1,45 @@
-<div id="buttons" class="d-flex flex-row gap-5 p-0 m-0">
-  <div *ngIf="isAnyTimerRunning; then runningBlock; else notRunningBlock"></div>
-  <ng-template #notRunningBlock>
-      <div id="start-button" (click)="startPressed.emit()">
-          <i class="bi bi-play-fill"></i>
-      </div>
-  </ng-template>
+<div id="controller-buttons" class="d-flex flex-row gap-5 p-0 m-0">
+    <div *ngIf="isAnyTimerRunning; then runningBlock; else notRunningBlock"></div>
+    <ng-template #notRunningBlock>
+        <div id="start-button" (click)="startPressed.emit()">
+            <i class="bi bi-play-fill"></i>
+        </div>
+    </ng-template>
 
-  <ng-template #runningBlock>
-      <div *ngIf="isCurrentTimerPaused; then pauseBlock; else notPauseBlock"></div>
-      <ng-template #notPauseBlock>
-          <div id="pause-button" (click)="pausePressed.emit()">
-              <i class="bi bi-pause-fill"></i>
-          </div>
-      </ng-template>
+    <ng-template #runningBlock>
+        <div *ngIf="isCurrentTimerPaused; then pauseBlock; else notPauseBlock"></div>
+        <ng-template #notPauseBlock>
+            <div id="pause-button" (click)="pausePressed.emit()">
+                <i class="bi bi-pause-fill"></i>
+            </div>
+        </ng-template>
 
-      <ng-template #pauseBlock>
-          <div id="paused-start-button" (click)="continuePressed.emit()">
-              <i class="bi bi-play-fill"></i>
-          </div>
-      </ng-template>
+        <ng-template #pauseBlock>
+            <div id="paused-start-button" (click)="continuePressed.emit()">
+                <i class="bi bi-play-fill"></i>
+            </div>
+        </ng-template>
 
-      <div id="paused-stop-button" (click)="stopPressed.emit()">
-          <i class="bi bi-stop-fill"></i>
-      </div>
-  </ng-template>
+        <div id="paused-stop-button" (click)="stopPressed.emit()">
+            <i class="bi bi-stop-fill"></i>
+        </div>
+    </ng-template>
+</div>
+
+<div id="sound-buttons">
+    <div>
+        <label class="mr-2">Turn on music</label>
+        <input type="checkbox" (change)="onMusicCheckboxChanged($event)">
+    </div>
+    <div id="music-to-play">
+        <div>
+            <label class="mr-2">Brow Noise</label>
+            <input id="browNoise" type="radio" name="music_to_play">
+        </div>
+
+        <div>
+            <label class="mr-2">LoFi</label>
+            <input id="loFi" type="radio" name="music_to_play">
+        </div>
+    </div>
 </div>

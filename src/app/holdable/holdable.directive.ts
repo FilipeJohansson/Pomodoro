@@ -1,5 +1,5 @@
-import { Directive, EventEmitter, HostListener, Output, Signal, computed, signal } from '@angular/core';
-import { HoldableStatus } from './holdable.model';
+import { Directive, EventEmitter, HostListener, Output, Signal, computed, signal } from '@angular/core'
+import { HoldableStatus } from './holdable.model'
 
 @Directive({
   selector: '[holdable]',
