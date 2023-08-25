@@ -1,29 +1,36 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { TimerComponent } from './timer/timer.component';
-import { Time } from './timer/timer.model';
+import { TimersComponent } from './timers/timers.component';
 import { TimersService } from './timers/timers.service';
 
 @Component({
+  standalone: true,
+  imports: [TimersComponent],
+  providers: [Title],
   selector: 'p-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
+  private titleService = inject(Title)
+  private timersService = inject(TimersService)
+
   title = 'Pomodoro'
 
-  constructor(private titleService: Title,
-    private timersService: TimersService) {
-    this.timersService.changeTimerEvent.subscribe((timer: TimerComponent) => {
-      timer.onTimeChange.subscribe((time: Time) => {
-        let title = timer.name + ' - ' + this.timeToString(time.minutes) + ':' + this.timeToString(time.seconds)
-        this.changeTitle(title)
-      })
+  constructor() {
+    effect(() => {
+      const timer = this.timersService.currentRunningTimer()
+      const time = timer?.onTimeChange()
 
-      this.timersService.isRunning.subscribe((isRunning: boolean) => {
-        if (!isRunning)
-          this.changeTitle(this.title)
-      })
+      if (timer && time) {
+        let title = timer.name + ' - ' + this.timeToString(time.minutes) + ':' + this.timeToString(time.seconds)
+        if (!this.timersService.currentRunningTimer()?.isRunning()) title = timer.name + ' - Paused'
+
+        this.changeTitle(title)
+      }
+
+      if (this.timersService.currentRunningTimer()?.isStopped()) this.changeTitle(this.title)
     })
   }
 

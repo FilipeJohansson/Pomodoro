@@ -1,6 +1,6 @@
 <div class="row m-0 p-0">
     <div id="controllers" class="d-flex flex-row gap-5 p-0 m-0">
-        <div *ngIf="isRunning; then runningBlock else notRunningBlock"></div>
+        <div *ngIf="this.timersService.isAnyTimerRunning(); then runningBlock; else notRunningBlock"></div>
         <ng-template #notRunningBlock>
             <div id="start-button" (click)="onStartPressed()">
                 <i class="bi bi-play-fill"></i>
@@ -8,28 +8,28 @@
         </ng-template>
 
         <ng-template #runningBlock>
-            <div *ngIf="isPause; then pauseBlock else notPauseBlock"></div>
+            <div *ngIf="this.timersService.isCurrentTimerPaused(); then pauseBlock; else notPauseBlock"></div>
             <ng-template #notPauseBlock>
-                <div id="stop-button" (click)="onPausePressed()">
+                <div id="pause-button" (click)="onPausePressed()">
                     <i class="bi bi-pause-fill"></i>
                 </div>
             </ng-template>
 
             <ng-template #pauseBlock>
-                <div id="stop-button" (click)="onContinuePressed()">
+                <div id="paused-start-button" (click)="onContinuePressed()">
                     <i class="bi bi-play-fill"></i>
                 </div>
             </ng-template>
 
-            <div id="stop-button" (click)="onStopPressed()">
+            <div id="paused-stop-button" (click)="onStopPressed()">
                 <i class="bi bi-stop-fill"></i>
             </div>
         </ng-template>
     </div>
 
     <div *ngFor="let timer of timersData" class="col-sm-12 col-md-6 p-0">
-        <p-timer (timer)="addTimer($event)" (timeEnds)="timeEnds()" [backgroundColor]="timer.backgroundColor"
-            [name]="timer.name" [time]="timer.time">
+        <p-timer (timer)="onAddTimer($event)" (timerEnds)="onTimerEnds()" [backgroundColor]="timer.backgroundColor"
+            [name]="timer.name" [time]="timer.time" [isAnyTimerRunning]="this.timersService.isAnyTimerRunning">
         </p-timer>
     </div>
 </div>

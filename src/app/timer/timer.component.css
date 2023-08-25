@@ -3,7 +3,15 @@
 }
 
 .bg-blue {
-    background-color: #59a4ca;
+  background-color: #59a4ca;
+}
+
+.bg-orange {
+  background-color: #f0a653;
+}
+
+.bg-purple {
+  background-color: #906bc7;
 }
 
 #header span {

@@ -1,137 +1,155 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
-import { TimersService } from '../timers/timers.service'
-import { Colors, Time } from './timer.model'
+import { CommonModule } from '@angular/common'
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, Signal, effect, signal } from '@angular/core'
+import { HoldableDirective } from '../holdable/holdable.directive'
+import { Colors, TimeModel } from './timer.model'
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, HoldableDirective],
   selector: 'p-timer',
   templateUrl: './timer.component.html',
-  styleUrls: ['./timer.component.css']
+  styleUrls: ['./timer.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TimerComponent implements OnInit {
-  MAX_TIME: number = 60
-  MIN_TIME: number = 1
+  readonly MAX_TIME: number = 90
+  readonly MIN_TIME: number = 1
 
-  @Input() backgroundColor: Colors
-  @Input() name: string
-  @Input('time') currentTime: Time
+  @Input({ required: true }) backgroundColor: Colors
+  @Input({ required: true }) name: string
+  @Input({ required: true }) isAnyTimerRunning: Signal<boolean>;
+  @Input({ alias: 'time', required: true }) userDefinedTime: TimeModel
 
-  @Output() timeEnds: EventEmitter<boolean> = new EventEmitter()
+  @Output() timerEnds: EventEmitter<boolean> = new EventEmitter()
   @Output() timer: EventEmitter<TimerComponent> = new EventEmitter()
-  onTimeChange: EventEmitter<Time> = new EventEmitter()
 
-  isRunning: boolean = false
-  isAnyTimerRunning: boolean = false
+  currentRunningTime = signal<TimeModel>({ minutes: 0, seconds: 0 })
+  userDefinedTimeChange = signal<TimeModel>({ minutes: 0, seconds: 0 })
 
-  originalTime: Time = { minutes: 0, seconds: 0 }
-  minutes: string
-  seconds: string
+  onTimeChange = signal<TimeModel | undefined>(undefined)
+  currentRunningTimeString = signal<{ minutes: string, seconds: string }>({ minutes: '0', seconds: '0' })
+
+  isRunning = signal<boolean>(false)
+  isStopped = signal<boolean>(true)
 
   interval: any
 
-  constructor(private timersService: TimersService) {
-    this.timersService.isRunning.subscribe((isRunning: boolean) => {
-      this.isAnyTimerRunning = isRunning
-    })
+  endSound: HTMLAudioElement = new Audio('./assets/sounds/end.mp3')
+  bipSound: HTMLAudioElement = new Audio('./assets/sounds/bip.mp3')
+
+  constructor() {
+    effect(() => {
+      this.timeToString(this.currentRunningTime())
+    }, {allowSignalWrites: true})
+
+    effect(() => {
+      this.timeToString(this.userDefinedTimeChange())
+    }, {allowSignalWrites: true})
   }
 
   ngOnInit(): void {
     this.timer.emit(this)
 
-    this.setupTimer()
+    this.resetTimer()
   }
 
-  setupTimer() {
-    this.originalTime = { ...this.currentTime }
-    this.timeToString()
+  /**
+   * Resets the timer to its user defined time
+   */
+  resetTimer() {
+    this.currentRunningTime.set({ ...this.userDefinedTime })
   }
 
   startTimer() {
-    this.setupTimer()
-    this.isRunning = true
+    this.resetTimer()
+
+    this.isRunning.set(true)
+    this.isStopped.set(false)
 
     this.interval = setInterval(() => {
-      if (this.isRunning) {
+      if (this.isRunning()) {
         this.updateTimer()
-        this.timeToString()
       }
     }, 1000)
   }
 
   pauseTimer() {
-    this.isRunning = false
+    this.isRunning.set(false)
   }
 
   continueTimer() {
-    this.isRunning = true
+    this.isRunning.set(true)
   }
 
   stopTimer() {
     clearInterval(this.interval)
 
-    this.isRunning = false
-    this.currentTime = this.originalTime
-    this.timeToString()
+    this.isRunning.set(false)
+    this.isStopped.set(true)
+    this.resetTimer()
   }
 
-  endTimer() {
+  timeEnded() {
     this.stopTimer()
     this.playEndSound()
-    this.timeEnds.emit(true)
+    this.timerEnds.emit(true)
   }
 
   increaseMinutes() {
-    this.currentTime.minutes = (this.currentTime.minutes++) >= this.MAX_TIME ? this.MAX_TIME : this.currentTime.minutes++
-    this.originalTime.minutes = this.currentTime.minutes
-    this.timeToString()
+    this.userDefinedTime.minutes++
+    if (this.userDefinedTime.minutes > this.MAX_TIME) this.userDefinedTime.minutes =  this.MAX_TIME
+    this.userDefinedTimeChange.set(this.userDefinedTime)
   }
 
   decreaseMinutes() {
-    this.currentTime.minutes = (this.currentTime.minutes--) <= this.MIN_TIME ? this.MIN_TIME : this.currentTime.minutes--
-    this.originalTime.minutes = this.currentTime.minutes
-    this.timeToString()
+    this.userDefinedTime.minutes--
+    if (this.userDefinedTime.minutes < this.MIN_TIME) this.userDefinedTime.minutes =  this.MIN_TIME
+    this.userDefinedTimeChange.set(this.userDefinedTime)
   }
 
   updateTimer() {
-    this.currentTime.seconds--
+    let currentRunningTimeTemp = this.currentRunningTime()
 
-    if (this.currentTime.seconds <= 0) {
-      this.currentTime.seconds = 59
-      this.currentTime.minutes--
+    currentRunningTimeTemp.seconds--
 
-      if (this.currentTime.minutes < 0)
-        this.endTimer()
+    if (currentRunningTimeTemp.seconds <= 0) {
+      currentRunningTimeTemp.minutes--
+
+      if (currentRunningTimeTemp.minutes < 0) this.timeEnded()
+      else currentRunningTimeTemp.seconds = 59
     }
 
-    if (this.currentTime.seconds <= 3 && this.currentTime.minutes <= 0)
-      this.playBipSound()
+    if (this.isRunning()) {
+      this.currentRunningTime.set(currentRunningTimeTemp)
 
-    this.onTimeChange.emit(this.currentTime)
+      if (currentRunningTimeTemp.seconds <= 3 && currentRunningTimeTemp.minutes <= 0)
+        this.playBipSound()
+    }
+
+    this.onTimeChange.set(this.currentRunningTime())
+  }
+
+  timeToString(time: TimeModel) {
+    const minutes = time.minutes.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false
+    })
+
+    const seconds = time.seconds.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false
+    })
+
+    this.currentRunningTimeString.set({ minutes: minutes, seconds: seconds });
   }
 
   playEndSound() {
-    let audio = new Audio();
-    audio.src = "./assets/sounds/end.mp3"
-    audio.load()
-    audio.play()
+    this.endSound.load()
+    this.endSound.play()
   }
 
   playBipSound() {
-    let audio = new Audio();
-    audio.src = "./assets/sounds/bip.mp3"
-    audio.load()
-    audio.play()
+    this.bipSound.load()
+    this.bipSound.play()
   }
-
-  timeToString() {
-    this.minutes = this.currentTime.minutes.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false
-    })
-
-    this.seconds = this.currentTime.seconds.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false
-    })
-  }
-
 }

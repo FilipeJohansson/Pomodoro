@@ -1,15 +1,17 @@
 export interface TimerModel {
-    backgroundColor: Colors
-    name: string
-    time: Time
+  backgroundColor: Colors
+  name: string
+  time: TimeModel
 }
 
-export interface Time {
-    minutes: number
-    seconds: number
+export interface TimeModel {
+  minutes: number
+  seconds: number
 }
 
 export enum Colors {
-    GREEN = 'bg-green',
-    BLUE = 'bg-blue'
+  GREEN = 'bg-green',
+  BLUE = 'bg-blue',
+  ORANGE = 'bg-orange',
+  PURPLE = 'bg-purple',
 }

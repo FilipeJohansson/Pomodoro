@@ -1,42 +1,33 @@
-import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
-import { Observable, Subject, filter, interval, takeUntil, tap } from 'rxjs';
+import { Directive, EventEmitter, HostListener, Output, Signal, computed, signal } from '@angular/core';
+import { HoldableStatus } from './holdable.model';
 
 @Directive({
-  selector: '[holdable]'
+  selector: '[holdable]',
+  standalone: true
 })
 export class HoldableDirective {
   @Output() holdTime: EventEmitter<number> = new EventEmitter()
 
-  state: Subject<string> = new Subject()
+  stateSignal = signal<HoldableStatus>(HoldableStatus.CANCELED)
 
-  cancel: Observable<string>
-
-  constructor() {
-    this.cancel = this.state.pipe(
-      filter(v => v === 'cancel'),
-      tap(v => {
-        this.holdTime.emit(0)
-      })
-    )
-  }
+  cancelSignal: Signal<boolean> = computed(() => this.stateSignal() === HoldableStatus.CANCELED)
 
   @HostListener('mouseup', ['$event'])
   @HostListener('mouseleave', ['$event'])
   onExit() {
-    this.state.next('cancel')
+    this.stateSignal.set(HoldableStatus.CANCELED)
   }
 
   @HostListener('mousedown', ['$event'])
   onHold() {
-    this.state.next('start')
+    this.stateSignal.set(HoldableStatus.STARTED)
 
-    const n = 100
-    interval(n).pipe(
-      takeUntil(this.cancel),
-      tap((v: number) => {
-        this.holdTime.emit(v * n)
-      }),
-    ).subscribe()
+    const n = 150
+    let interval = setInterval((v) => {
+      if (this.cancelSignal())
+        clearInterval(interval)
+      this.holdTime.emit(v * n)
+    }, n)
   }
 
 }
