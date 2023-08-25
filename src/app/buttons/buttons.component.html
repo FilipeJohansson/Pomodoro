@@ -1,0 +1,27 @@
+<div id="buttons" class="d-flex flex-row gap-5 p-0 m-0">
+  <div *ngIf="isAnyTimerRunning; then runningBlock; else notRunningBlock"></div>
+  <ng-template #notRunningBlock>
+      <div id="start-button" (click)="startPressed.emit()">
+          <i class="bi bi-play-fill"></i>
+      </div>
+  </ng-template>
+
+  <ng-template #runningBlock>
+      <div *ngIf="isCurrentTimerPaused; then pauseBlock; else notPauseBlock"></div>
+      <ng-template #notPauseBlock>
+          <div id="pause-button" (click)="pausePressed.emit()">
+              <i class="bi bi-pause-fill"></i>
+          </div>
+      </ng-template>
+
+      <ng-template #pauseBlock>
+          <div id="paused-start-button" (click)="continuePressed.emit()">
+              <i class="bi bi-play-fill"></i>
+          </div>
+      </ng-template>
+
+      <div id="paused-stop-button" (click)="stopPressed.emit()">
+          <i class="bi bi-stop-fill"></i>
+      </div>
+  </ng-template>
+</div>

@@ -19,14 +19,8 @@ export class TimersComponent {
   timersData: TimerModel[] = [
     { backgroundColor: Colors.BLUE, name: 'WORK', time: { minutes: 0, seconds: 5 } },
     { backgroundColor: Colors.GREEN, name: 'BREAK', time: { minutes: 0, seconds: 7 } },
-    { backgroundColor: Colors.ORANGE, name: 'BREAK', time: { minutes: 0, seconds: 7 } },
-    { backgroundColor: Colors.PURPLE, name: 'BREAK', time: { minutes: 0, seconds: 7 } },
   ];
 
   onAddTimer = (timer: TimerComponent) => this.timersService.addTimer(timer)
-  onStartPressed = () => this.timersService.startNextTimer()
-  onStopPressed = () => this.timersService.stopCurrentTimer()
-  onPausePressed = () => this.timersService.pauseCurrentTimer()
-  onContinuePressed = () => this.timersService.continueCurrentTimer()
   onTimerEnds = () => this.timersService.endTimer()
 }

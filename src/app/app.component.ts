@@ -1,11 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { ButtonsComponent } from './buttons/buttons.component';
 import { TimersComponent } from './timers/timers.component';
 import { TimersService } from './timers/timers.service';
 
 @Component({
   standalone: true,
-  imports: [TimersComponent],
+  imports: [CommonModule, TimersComponent, ButtonsComponent],
   providers: [Title],
   selector: 'p-root',
   templateUrl: './app.component.html',
@@ -13,8 +15,8 @@ import { TimersService } from './timers/timers.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
-  private titleService = inject(Title)
-  private timersService = inject(TimersService)
+  titleService = inject(Title)
+  timersService = inject(TimersService)
 
   title = 'Pomodoro'
 
@@ -44,4 +46,9 @@ export class AppComponent {
       useGrouping: false
     })
   }
+
+  onStartPressed = () => this.timersService.startNextTimer()
+  onStopPressed = () => this.timersService.stopCurrentTimer()
+  onPausePressed = () => this.timersService.pauseCurrentTimer()
+  onContinuePressed = () => this.timersService.continueCurrentTimer()
 }

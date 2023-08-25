@@ -1,1 +1,9 @@
-<p-timers></p-timers>
+<p-timers/>
+<p-buttons
+  [isAnyTimerRunning]="this.timersService.isAnyTimerRunning()"
+  [isCurrentTimerPaused]="this.timersService.isCurrentTimerPaused()"
+  (startPressed)="onStartPressed()"
+  (stopPressed)="onStopPressed()"
+  (pausePressed)="onPausePressed()"
+  (continuePressed)="onContinuePressed()"
+/>
